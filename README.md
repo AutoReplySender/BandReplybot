@@ -1,14 +1,14 @@
 # BandReplybot
 
-用于 [BAND](https://band.us/) 的自动回复 bot。`autoreply.json` 中是要检测的关键词和检测到对应关键词时的回复（若为同一条目设置多项回复，bot 会随机选择一项）。`config.json` 是 bot 的配置文件，其中`max_trigger_times_by_single_post` 是单个贴子最多触发几条回复，当前设置为 2 条。由于 BAND [只有回复贴子的 API，没有回复回复的 API](https://developers.band.us/develop/guide/api)，本 bot 只对主题贴一楼的内容进行检测。
+用于 [BAND](https://band.us/) 的自动回复 bot。`auto-reply.json` 中是要检测的关键词和检测到对应关键词时的回复（若为同一条目设置多项回复，bot 会随机选择一项）。`config.json` 是 bot 的配置文件，其中`max_trigger_times_by_single_post` 是单个贴子最多触发几条回复，当前设置为 2 条。由于 BAND [只有回复贴子的 API，没有回复回复的 API](https://developers.band.us/develop/guide/api)，本 bot 只对主题贴一楼的内容进行检测。
 
 bot 会对首次检测到发布图片贴的用户进行提醒，让其注意图片的 [EXIF 信息](https://en.wikipedia.org/wiki/Exif)。如不需要提醒，请注释或删去以下代码行：
 
 ```python
 if author_key not in state.reminded_author.keys():
-    if containPictures(post["photos"]):
+    if contain_pictures(post["photos"]):
         for i in range(max_comment_try_times):
-            result = writeComment(
+            result = write_comment(
                 access_token, key, post["post_key"], "您好，这是我首次检测到您的账号发布图片贴，请注意BAND不会自动删除图片的EXIF信息，参见 https://band.us/band/87834662/post/2657\n如果您发布了自己拍摄的照片，建议立即删除贴子。注意：勾选禁止下载无法阻止EXIF信息泄露！")
             for t in range(10):
                 time.sleep(1)
