@@ -7,15 +7,15 @@ with open("./config.json", "r", encoding="utf-8") as configJson:
 access_token = configDict["access_token"]
 
 
-def getBands(access_token: str) -> list:
+def get_bands(access_token_: str) -> list:
     url = "https://openapi.band.us/v2.1/bands"
     params = {
-        "access_token": access_token,
+        "access_token": access_token_,
     }
     r = requests.get(url, params=params)
     result = json.loads(r.text)
     return result
 
 
-bands = getBands(access_token)
+bands = get_bands(access_token)
 print(bands)

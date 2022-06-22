@@ -9,9 +9,9 @@ from random import randint
 
 keywords_list = []
 replies_list = []
-with open("./autoreply.json", "r", encoding="utf-8") as autoReplyJson:
+with open("./auto-reply.json", "r", encoding="utf-8") as autoReplyJson:
     autoReplyDict = json.loads(autoReplyJson.read())
-for item in autoReplyDict["autoreply"]:
+for item in autoReplyDict["auto-reply"]:
     keywords_list.append(item["keywords"])
     replies_list.append(item["replies"])
 
@@ -37,10 +37,10 @@ class GetPostsException(ReplySenderBaseException):
                       requests.exceptions.RequestException,
                       max_time=60,
                       max_tries=5)
-def getPosts(access_token: str, band_key: str, locale: str) -> list:
+def get_posts(access_token_: str, band_key: str, locale: str) -> list:
     url = "https://openapi.band.us/v2/band/posts"
     params = {
-        "access_token": access_token,
+        "access_token": access_token_,
         "band_key": band_key,
         "locale": locale,
     }
@@ -56,11 +56,12 @@ def getPosts(access_token: str, band_key: str, locale: str) -> list:
                       requests.exceptions.RequestException,
                       max_time=60,
                       max_tries=5)
-def writeComment(access_token: str, band_key: str, post_key: str, body: str) -> bool:
+def write_comment(access_token_: str, band_key: str, post_key: str, body: str) -> bool:
     url = "https://openapi.band.us/v2/band/post/comment/create"
-    suffixed_body = body + "\n\nI am a bot, and this action was performed automatically. Please contact 织女小e if you have any questions or concerns."
+    suffixed_body = body + "\n\nI am a bot, and this action was performed automatically. Please contact 织女小e if you " \
+                           "have any questions or concerns. "
     params = {
-        "access_token": access_token,
+        "access_token": access_token_,
         "band_key": band_key,
         "post_key": post_key,
         "body": suffixed_body
@@ -72,21 +73,21 @@ def writeComment(access_token: str, band_key: str, post_key: str, body: str) -> 
     return False
 
 
-def containPictures(photos):
+def contain_pictures(photos):
     for photo in photos:
-        if photo["is_video_thumbnail"] == False:
+        if not photo["is_video_thumbnail"]:
             return True
     return False
 
 
-def checkKeywords(keywords: list, content: str) -> bool:
+def check_keywords(keywords: list, content: str) -> bool:
     for keyword in keywords:
         if keyword in content:
             return True
     return False
 
 
-def chooseReply(replies: list) -> str:
+def choose_reply(replies: list) -> str:
     chosen_index = randint(0, len(replies) - 1)
     return replies[chosen_index]
 
@@ -104,7 +105,7 @@ def main_loop(state):
         print("Begin post check.")
         current_timestamp = state.bands[key]["checked_timestamp"]
         max_timestamp = current_timestamp
-        posts = getPosts(access_token, key, "zh_CN")
+        posts = get_posts(access_token, key, "zh_CN")
         for post in posts:
             trigger_times = 0
             if post["created_at"] > current_timestamp:
@@ -113,9 +114,9 @@ def main_loop(state):
                 author_key = post["author"]["user_key"]
                 for (keywords, replies) in zip(keywords_list, replies_list):
                     content = post["content"]
-                    if checkKeywords(keywords, content) and trigger_times < max_trigger_times_by_single_post:
-                        chosen_reply = chooseReply(replies)
-                        result = writeComment(
+                    if check_keywords(keywords, content) and trigger_times < max_trigger_times_by_single_post:
+                        chosen_reply = choose_reply(replies)
+                        result = write_comment(
                             access_token, key, post["post_key"], chosen_reply)
                         if result:
                             print(f"{chosen_reply} added.")
@@ -125,10 +126,13 @@ def main_loop(state):
                         for t in range(10):
                             time.sleep(1)
                 if author_key not in state.reminded_author.keys():
-                    if containPictures(post["photos"]):
+                    if contain_pictures(post["photos"]):
                         for i in range(max_comment_try_times):
-                            result = writeComment(
-                                access_token, key, post["post_key"], "您好，这是我首次检测到您的账号发布图片贴，请注意BAND不会自动删除图片的EXIF信息，参见 https://band.us/band/87834662/post/2657\n如果您发布了自己拍摄的照片，建议立即删除贴子。注意：勾选禁止下载无法阻止EXIF信息泄露！")
+                            result = write_comment(
+                                access_token, key, post["post_key"],
+                                "您好，这是我首次检测到您的账号发布图片贴，请注意BAND不会自动删除图片的EXIF信息，参见 "
+                                "https://band.us/band/87834662/post/2657\n如果您发布了自己拍摄的照片，建议立即删除贴子。注意：勾选禁止下载无法阻止EXIF"
+                                "信息泄露！")
                             for t in range(10):
                                 time.sleep(1)
                             if result:
