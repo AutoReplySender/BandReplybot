@@ -12,7 +12,7 @@ def get_bands(access_token_: str) -> list:
     params = {
         "access_token": access_token_,
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, timeout=20)
     result = json.loads(r.text)
     return result
 

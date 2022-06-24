@@ -44,7 +44,7 @@ def get_posts(access_token_: str, band_key: str, locale: str) -> list:
         "band_key": band_key,
         "locale": locale,
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, timeout=20)
     result = json.loads(r.text)
     if result["result_code"] != 1:
         raise GetPostsException(
@@ -58,7 +58,7 @@ def get_posts(access_token_: str, band_key: str, locale: str) -> list:
                       max_tries=5)
 def write_comment(access_token_: str, band_key: str, post_key: str, body: str) -> bool:
     url = "https://openapi.band.us/v2/band/post/comment/create"
-    suffixed_body = body + "\n\nI am a bot, and this action was performed automatically. Please contact 织女小e if you " \
+    suffixed_body = body + "\n\nI am a bot, and this action was performed automatically. Please contact 兔友小e if you " \
                            "have any questions or concerns. "
     params = {
         "access_token": access_token_,
@@ -66,7 +66,7 @@ def write_comment(access_token_: str, band_key: str, post_key: str, body: str) -
         "post_key": post_key,
         "body": suffixed_body
     }
-    r = requests.post(url, params=params)
+    r = requests.post(url, params=params, timeout=20)
     result = json.loads(r.text)
     if result["result_code"] == 1:
         return True
