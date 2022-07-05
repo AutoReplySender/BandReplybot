@@ -5,6 +5,7 @@ import backoff
 import time
 import os
 import sys
+from datetime import datetime
 from random import randint
 
 keywords_list = []
@@ -105,7 +106,14 @@ def main_loop(state):
         print("Begin post check.")
         current_timestamp = state.bands[key]["checked_timestamp"]
         max_timestamp = current_timestamp
-        posts = get_posts(access_token, key, "zh_CN")
+        try:
+            posts = get_posts(access_token, key, "zh_CN")
+        except requests.exceptions.RequestException:
+            posts = []
+            with open("./failure_log.txt", "a+") as failure_log:
+                now = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
+                print(f"{now}, get posts failed.")
+                print(f"{now}, get posts failed.", file=failure_log)
         for post in posts:
             trigger_times = 0
             if post["created_at"] > current_timestamp:
@@ -123,6 +131,10 @@ def main_loop(state):
                             trigger_times += 1
                         else:
                             print(f"{chosen_reply} failed.")
+                            with open("./failure_log.txt", "a+") as failure_log:
+                                now = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
+                                print(f"{now}, {chosen_reply} failed.",
+                                      file=failure_log)
                         for t in range(10):
                             time.sleep(1)
                 if author_key not in state.reminded_author.keys():
