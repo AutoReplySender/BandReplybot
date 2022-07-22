@@ -117,9 +117,8 @@ def main_loop(state):
                 now = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
                 print(f"{now}, get posts failed.")
                 print(f"{now}, get posts failed.", file=failure_log)
+        current_band_post_file = open(band_save_path / f"{key}.txt", "a+", encoding="utf-8")        
         for post in posts:
-            current_band_post_file = open(
-                band_save_path / f"{key}.txt", "a+", encoding="utf-8")
             trigger_times = 0
             if post["created_at"] > current_timestamp:
                 print(post, file=current_band_post_file)
@@ -158,7 +157,7 @@ def main_loop(state):
                                 break
                 if author_key not in state.reminded_author.keys():
                     state.reminded_author[author_key] = post["author"]["name"]
-            current_band_post_file.close()
+        current_band_post_file.close()
         state.bands[key]["checked_timestamp"] = max_timestamp
     print("Posts checked.")
     for t in range(2 * 60):
