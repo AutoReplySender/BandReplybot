@@ -5,6 +5,7 @@ import backoff
 import time
 import os
 import sys
+import pathlib
 from datetime import datetime
 from random import randint
 
@@ -102,6 +103,8 @@ class ReplySenderState:
 
 def main_loop(state):
     print(f"Begin loop: {state.loop_times}")
+    band_save_path = pathlib.Path("./band_save")
+    band_save_path.mkdir(parents=True, exist_ok=True)
     for key in state.bands.keys():
         print("Begin post check.")
         current_timestamp = state.bands[key]["checked_timestamp"]
@@ -115,8 +118,11 @@ def main_loop(state):
                 print(f"{now}, get posts failed.")
                 print(f"{now}, get posts failed.", file=failure_log)
         for post in posts:
+            current_band_post_file = open(
+                band_save_path / f"{key}.txt", "a+", encoding="utf-8")
             trigger_times = 0
             if post["created_at"] > current_timestamp:
+                print(post, file=current_band_post_file)
                 if post["created_at"] > max_timestamp:
                     max_timestamp = post["created_at"]
                 author_key = post["author"]["user_key"]
@@ -152,6 +158,7 @@ def main_loop(state):
                                 break
                 if author_key not in state.reminded_author.keys():
                     state.reminded_author[author_key] = post["author"]["name"]
+            current_band_post_file.close()
         state.bands[key]["checked_timestamp"] = max_timestamp
     print("Posts checked.")
     for t in range(2 * 60):
