@@ -23,6 +23,7 @@ access_token = configDict["access_token"]
 band_key_to_check = configDict["band_key_to_check"]
 max_comment_try_times = configDict["max_comment_try_times"]
 max_trigger_times_by_single_post = configDict["max_trigger_times_by_single_post"]
+check_interval_in_minutes = configDict["check_interval_in_minutes"]
 
 
 class ReplySenderBaseException(Exception):
@@ -117,7 +118,8 @@ def main_loop(state):
                 now = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
                 print(f"{now}, get posts failed.")
                 print(f"{now}, get posts failed.", file=failure_log)
-        current_band_post_file = open(band_save_path / f"{key}.txt", "a+", encoding="utf-8")        
+        current_band_post_file = open(
+            band_save_path / f"{key}.txt", "a+", encoding="utf-8")
         for post in posts:
             trigger_times = 0
             if post["created_at"] > current_timestamp:
@@ -160,7 +162,7 @@ def main_loop(state):
         current_band_post_file.close()
         state.bands[key]["checked_timestamp"] = max_timestamp
     print("Posts checked.")
-    for t in range(2 * 60):
+    for t in range(check_interval_in_minutes * 60):
         time.sleep(1)
 
 

@@ -3,6 +3,7 @@
     "access_token": "", 
     "band_key_to_check": [""],
     "max_comment_try_times": 3,
-    "max_trigger_times_by_single_post": 2
+    "max_trigger_times_by_single_post": 2,
+	"check_interval_in_minutes": 4
   }
 }
