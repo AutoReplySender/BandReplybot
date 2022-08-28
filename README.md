@@ -1,5 +1,9 @@
 # BandReplybot
 
+**已归档。功能更完善的新bot[参见这里](https://github.com/AutoReplySender/AutoReplyBot)。**
+
+---
+
 用于 [BAND](https://band.us/) 的自动回复 bot。`auto-reply.json` 中是要检测的关键词和检测到对应关键词时的回复（若为同一条目设置多项回复，bot 会随机选择一项）。`config.json` 是 bot 的配置文件，其中`max_trigger_times_by_single_post` 是单个贴子最多触发几条回复，当前设置为 2 条。由于 BAND [只有回复贴子的 API，没有回复回复的 API](https://developers.band.us/develop/guide/api)，本 bot 只对主题贴一楼的内容进行检测。
 
 bot 会对首次检测到发布图片贴的用户进行提醒，让其注意图片的 [EXIF 信息](https://en.wikipedia.org/wiki/Exif)。如不需要提醒，请注释或删去以下代码行：
